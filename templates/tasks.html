@@ -1,0 +1,41 @@
+{% extends 'base.html' %}{% block content %}
+<h1>Tasks</h1>
+<section class="panel">
+  <h2>Create Task</h2>
+  <form class="task-form" method="post" action="{{ url_for('create_task_form') }}">
+    <input name="title" placeholder="Task title" required>
+    <input name="description" placeholder="Description">
+    <select name="project_id" required><option value="">Select project</option>{% for p in projects %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}</select>
+    <select name="assignee_id"><option value="">Unassigned</option>{% for u in users %}<option value="{{ u.id }}">{{ u.name }}</option>{% endfor %}</select>
+    <select name="priority"><option>Low</option><option selected>Medium</option><option>High</option></select>
+    <input name="due_date" type="date">
+    <button class="btn">Create Task</button>
+  </form>
+</section>
+<section class="panel">
+<table>
+<thead><tr><th>Task</th><th>Project</th><th>Assignee</th><th>Created By</th><th>Priority</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody>
+{% for t in tasks %}
+<tr class="{{ 'overdue-row' if t.is_overdue() else '' }}">
+<td><b>{{ t.title }}</b><br><small>{{ t.description }}</small></td>
+<td>{{ t.project.name }}</td>
+<td>{{ t.assignee.name if t.assignee else 'Unassigned' }}</td>
+<td>{{ t.creator.name }}</td>
+<td>{{ t.priority }}</td>
+<td>{{ t.due_date or '-' }}</td>
+<td><form method="post" action="{{ url_for('update_task_status_form', task_id=t.id) }}"><select name="status" onchange="this.form.submit()"><option {{ 'selected' if t.status=='Todo' else '' }}>Todo</option><option {{ 'selected' if t.status=='In Progress' else '' }}>In Progress</option><option {{ 'selected' if t.status=='Done' else '' }}>Done</option></select></form></td>
+<td>
+  {% if current_user.role == 'Admin' or t.created_by_id == current_user.id %}
+  <form method="post" action="{{ url_for('delete_task_form', task_id=t.id) }}" onsubmit="return confirm('Delete task?');">
+    <button class="btn xsmall ghost">Delete</button>
+  </form>
+  {% else %}
+  -
+  {% endif %}
+</td>
+</tr>
+{% else %}<tr><td colspan="8">No tasks found.</td></tr>{% endfor %}
+</tbody></table>
+</section>
+{% endblock %}

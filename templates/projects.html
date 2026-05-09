@@ -1,0 +1,48 @@
+{% extends 'base.html' %}{% block content %}
+<h1>Projects & Team Management</h1>
+<section class="panel">
+  <h2>Create Project</h2>
+  <form class="inline-form" method="post" action="{{ url_for('create_project_form') }}">
+    <input name="name" placeholder="Project name" required>
+    <input name="description" placeholder="Description">
+    <button class="btn">Create</button>
+  </form>
+</section>
+<section class="cards">
+{% for p in projects %}
+  <div class="panel">
+    <div class="card-header">
+      <h2>{{ p.name }}</h2>
+      {% if current_user.role == 'Admin' or p.owner_id == current_user.id %}
+      <form method="post" action="{{ url_for('delete_project_form', project_id=p.id) }}" onsubmit="return confirm('Delete project?');">
+        <button class="btn small ghost">Delete</button>
+      </form>
+      {% endif %}
+    </div>
+    <p>{{ p.description or 'No description' }}</p>
+    <p><b>Owner:</b> {{ p.owner.name }}</p>
+    <p><b>Members:</b> {{ p.members|length }}</p>
+    {% if current_user.role == 'Admin' or p.owner_id == current_user.id %}
+    <form class="inline-form" method="post" action="{{ url_for('add_member_form', project_id=p.id) }}">
+      <select name="user_id">{% for u in users %}<option value="{{ u.id }}">{{ u.name }} - {{ u.role }}</option>{% endfor %}</select>
+      <button class="btn small">Add Member</button>
+    </form>
+    {% endif %}
+    <ul>
+      {% for m in p.members %}
+      <li>
+        {{ m.user.name }} ({{ m.user.role }})
+        {% if current_user.role == 'Admin' or p.owner_id == current_user.id %}
+          {% if m.user.id != p.owner_id %}
+          <form method="post" action="{{ url_for('remove_member_form', project_id=p.id, user_id=m.user.id) }}" class="inline-form" style="display:inline;">
+            <button class="btn xsmall ghost">Remove</button>
+          </form>
+          {% endif %}
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% else %}<p>No projects found.</p>{% endfor %}
+</section>
+{% endblock %}

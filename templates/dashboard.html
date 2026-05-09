@@ -1,0 +1,15 @@
+{% extends 'base.html' %}{% block content %}
+<div class="hero"><div><h1>Dashboard</h1><p>Track projects, assigned tasks, progress and overdue work.</p></div></div>
+<div class="stats">
+  <div class="card"><b>{{ stats.projects }}</b><span>Projects</span></div>
+  <div class="card"><b>{{ stats.tasks }}</b><span>Total Tasks</span></div>
+  <div class="card"><b>{{ stats.todo }}</b><span>Todo</span></div>
+  <div class="card"><b>{{ stats.progress }}</b><span>In Progress</span></div>
+  <div class="card"><b>{{ stats.done }}</b><span>Done</span></div>
+  <div class="card danger"><b>{{ stats.overdue }}</b><span>Overdue</span></div>
+</div>
+<section class="grid two">
+  <div class="panel"><h2>Recent Projects</h2>{% for p in projects[:5] %}<div class="row"><strong>{{ p.name }}</strong><span>{{ p.tasks|length }} tasks</span></div>{% else %}<p>No projects yet.</p>{% endfor %}</div>
+  <div class="panel"><h2>Recent Tasks</h2>{% for t in tasks[:8] %}<div class="row"><strong>{{ t.title }}</strong><span class="badge {{ 'overdue' if t.is_overdue() else '' }}">{{ t.status }}</span></div>{% else %}<p>No tasks yet.</p>{% endfor %}</div>
+</section>
+{% endblock %}

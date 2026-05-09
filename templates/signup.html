@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block content %}
+<section class="auth-card">
+  <h1>Signup</h1><p>Create Admin or Member account.</p>
+  <form method="post">
+    <label>Name</label><input name="name" required>
+    <label>Email</label><input name="email" type="email" required>
+    <label>Password</label><input name="password" type="password" minlength="6" required>
+    <label>Role</label><select name="role"><option>Member</option><option>Admin</option></select>
+    <button class="btn full">Create account</button>
+  </form>
+  <p>Already have account? <a href="{{ url_for('login') }}">Login</a></p>
+</section>
+{% endblock %}
